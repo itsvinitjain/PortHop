@@ -28,9 +28,12 @@ function RootLayoutNav() {
 
     if (!user && !inAuthGroup) {
       // User logged out or no session — go to login
-      router.replace("/(auth)/phone");
+      // Use setTimeout to ensure navigation happens after current render cycle
+      setTimeout(() => {
+        router.replace("/(auth)/phone");
+      }, 0);
     }
-  }, [user, loading, segments]);
+  }, [user, loading]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

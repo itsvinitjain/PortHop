@@ -144,11 +144,11 @@ backend:
 frontend:
   - task: "Logout functionality"
     implemented: true
-    working: "NA"
+    working: false
     file: "frontend/app/(captain)/profile.tsx, frontend/app/(passenger)/profile.tsx, frontend/app/_layout.tsx"
-    stuck_count: 2
+    stuck_count: 4
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "user"
@@ -159,6 +159,15 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "New fix implemented: Added RootLayoutNav component in _layout.tsx that uses useSegments + useEffect to watch user state. When user becomes null and not in auth group, it redirects to /(auth)/phone. Profile screens now just call logout() - no manual router.replace. This is the canonical Expo Router auth guard pattern."
+      - working: "NA"
+        agent: "main"
+        comment: "User still reports logout bug. Testing current implementation and will apply more robust fix if needed. Will check if the useEffect dependency array or redirect logic needs adjustment."
+      - working: "NA"
+        agent: "main"
+        comment: "Applied dual-layer fix: (1) Profile screens now call router.replace('/(auth)/phone') immediately after logout(), (2) _layout.tsx useEffect uses setTimeout(0) for redirect and removed segments from dependency array to ensure reliable triggering. Both captain and passenger profile screens updated. Ready for testing."
+      - working: false
+        agent: "testing"
+        comment: "TESTED with comprehensive Playwright script. LOGOUT BUG CONFIRMED - STILL BROKEN. Test details: (1) Successfully logged in as Captain (phone: 9876543210, OTP: 123456), completed profile setup. (2) Navigated to Profile tab - Profile page loaded correctly with logout button visible (testid='logout-btn'). (3) Clicked logout button using testid. (4) CRITICAL ISSUE: After clicking logout button, NO alert dialog appeared. The React Native Alert.alert() with Cancel/Logout options did not show. (5) User remained on profile screen at URL /profile. No redirect occurred. (6) Profile elements (logout button, edit button) still visible after 5+ seconds. CONCLUSION: Logout button click is not triggering the alert or any logout action. The handleLogout function in profile.tsx may not be executing properly. This is a React Native Web compatibility issue - Alert.alert() does not work in web browsers (Expo web build). Need to replace Alert.alert() with a custom modal/dialog component that works on web."
 
   - task: "Captain login and trip posting flow"
     implemented: true
@@ -201,3 +210,7 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Fixed the recurring logout bug by adding a persistent AuthGuard (RootLayoutNav) in _layout.tsx. This component uses useSegments + useRouter + useEffect to watch user state. When user becomes null and not in the auth group, it calls router.replace('/(auth)/phone'). Profile screens now only call logout() without any manual navigation. Please test the full logout flow: Login (phone: any 10 digits, OTP: 123456) -> complete profile setup (if new user) -> navigate to Profile tab -> click Logout button -> confirm -> should redirect to phone login screen."
+  - agent: "main"
+    message: "Applied enhanced logout fix with dual-layer approach: (1) Profile screens (captain & passenger) now directly call router.replace('/(auth)/phone') immediately after logout() (2) _layout.tsx auth guard enhanced with setTimeout(0) wrapper and removed segments dependency to ensure reliable redirect. This combines immediate navigation with fallback protection. Please test: Login -> Profile -> Logout -> Should immediately redirect to login screen."
+  - agent: "testing"
+    message: "CRITICAL BUG IDENTIFIED: Logout button does NOT work in web environment. Root cause: React Native's Alert.alert() does NOT function in web browsers (Expo web build). When logout button is clicked, the Alert dialog never appears, so the logout confirmation cannot be triggered. This is why no redirect happens - the logout() function is never called. SOLUTION REQUIRED: Replace Alert.alert() with a custom modal/dialog component that works on web. Both captain and passenger profile screens need this fix. Recommend using a React Native modal or a web-compatible confirmation dialog library."
