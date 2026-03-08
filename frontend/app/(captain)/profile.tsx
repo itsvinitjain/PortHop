@@ -10,6 +10,7 @@ import {
   TextInput,
   ActivityIndicator,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
@@ -20,6 +21,7 @@ import { COLORS } from "../../utils/constants";
 
 export default function CaptainProfile() {
   const { user, logout, refreshUser } = useAuth();
+  const router = useRouter();
   const [editVisible, setEditVisible] = useState(false);
   const [editName, setEditName] = useState(user?.name || "");
   const [editPhoto, setEditPhoto] = useState<string | null>(null);
@@ -62,7 +64,14 @@ export default function CaptainProfile() {
   const handleLogout = () => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
-      { text: "Logout", style: "destructive", onPress: logout },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          await logout();
+          router.replace("/(auth)/phone");
+        },
+      },
     ]);
   };
 
