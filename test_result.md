@@ -144,7 +144,7 @@ backend:
 frontend:
   - task: "Logout functionality"
     implemented: true
-    working: false
+    working: true
     file: "frontend/app/(captain)/profile.tsx, frontend/app/(passenger)/profile.tsx, frontend/app/_layout.tsx"
     stuck_count: 4
     priority: "high"
@@ -168,6 +168,12 @@ frontend:
       - working: false
         agent: "testing"
         comment: "TESTED with comprehensive Playwright script. LOGOUT BUG CONFIRMED - STILL BROKEN. Test details: (1) Successfully logged in as Captain (phone: 9876543210, OTP: 123456), completed profile setup. (2) Navigated to Profile tab - Profile page loaded correctly with logout button visible (testid='logout-btn'). (3) Clicked logout button using testid. (4) CRITICAL ISSUE: After clicking logout button, NO alert dialog appeared. The React Native Alert.alert() with Cancel/Logout options did not show. (5) User remained on profile screen at URL /profile. No redirect occurred. (6) Profile elements (logout button, edit button) still visible after 5+ seconds. CONCLUSION: Logout button click is not triggering the alert or any logout action. The handleLogout function in profile.tsx may not be executing properly. This is a React Native Web compatibility issue - Alert.alert() does not work in web browsers (Expo web build). Need to replace Alert.alert() with a custom modal/dialog component that works on web."
+      - working: "NA"
+        agent: "main"
+        comment: "ROOT CAUSE FIXED: Replaced Alert.alert() with Modal-based confirmation dialog that works on both web and native. Changes: (1) Removed Alert import, added logoutModalVisible state (2) handleLogout now sets modal state instead of calling Alert (3) Added confirmLogout function that executes logout + router.replace (4) Created web-compatible logout confirmation modal with testIDs. Both Captain and Passenger profile screens updated with identical fix. Ready for retesting."
+      - working: true
+        agent: "testing"
+        comment: "TESTED - LOGOUT FIX VERIFIED AND WORKING! Test flow: (1) Successfully logged in as Captain with phone 9876543211, OTP 123456, completed profile setup. (2) Navigated to Profile tab - profile screen loaded correctly. (3) Clicked Logout button - MODAL APPEARED SUCCESSFULLY (screenshot: 02_modal.png). (4) Modal verification: Title='Logout', Text='Are you sure you want to logout?', Cancel button present, Logout button present. (5) Clicked Logout button in modal - IMMEDIATE REDIRECT to phone login screen (screenshot: 03_login.png). (6) Login screen verified: URL changed to /phone, phone input field visible, 'Welcome aboard' text visible, 'Get OTP' button visible. CONCLUSION: Modal-based logout dialog is working perfectly on web. Alert.alert() successfully replaced with Modal component. Logout flow complete: Logout button → Modal appears → Confirm → Redirect to login. Fix confirmed working!"
 
   - task: "Captain login and trip posting flow"
     implemented: true
@@ -214,3 +220,7 @@ agent_communication:
     message: "Applied enhanced logout fix with dual-layer approach: (1) Profile screens (captain & passenger) now directly call router.replace('/(auth)/phone') immediately after logout() (2) _layout.tsx auth guard enhanced with setTimeout(0) wrapper and removed segments dependency to ensure reliable redirect. This combines immediate navigation with fallback protection. Please test: Login -> Profile -> Logout -> Should immediately redirect to login screen."
   - agent: "testing"
     message: "CRITICAL BUG IDENTIFIED: Logout button does NOT work in web environment. Root cause: React Native's Alert.alert() does NOT function in web browsers (Expo web build). When logout button is clicked, the Alert dialog never appears, so the logout confirmation cannot be triggered. This is why no redirect happens - the logout() function is never called. SOLUTION REQUIRED: Replace Alert.alert() with a custom modal/dialog component that works on web. Both captain and passenger profile screens need this fix. Recommend using a React Native modal or a web-compatible confirmation dialog library."
+  - agent: "main"
+    message: "Fixed Alert.alert() issue by replacing with Modal-based confirmation dialog. Implemented logoutModalVisible state and created custom logout modal with Cancel/Logout buttons. Both Captain and Passenger profile screens updated. Modal includes testIDs for testing: cancel-logout-btn and confirm-logout-btn. Ready for final testing."
+  - agent: "testing"
+    message: "✅ LOGOUT FIX VERIFIED AND WORKING! Comprehensive test completed with Playwright. Test results: (1) Login flow successful with phone 9876543211, OTP 123456, Captain profile setup complete. (2) Navigated to Profile screen successfully. (3) Clicked Logout button → Modal-based confirmation dialog appeared correctly. (4) Modal verified: Contains 'Logout' title, 'Are you sure you want to logout?' text, Cancel button, and Logout confirmation button. (5) Clicked Logout in modal → Immediate redirect to phone login screen at /phone. (6) Login screen verified: Phone input visible, Welcome text visible, Get OTP button visible. CONCLUSION: Alert.alert() successfully replaced with Modal component. Logout functionality is now WORKING on web. Fix confirmed! No further action needed for this task."

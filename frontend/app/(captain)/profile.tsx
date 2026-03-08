@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   ScrollView,
   Modal,
   TextInput,
@@ -23,6 +22,7 @@ export default function CaptainProfile() {
   const { user, logout, refreshUser } = useAuth();
   const router = useRouter();
   const [editVisible, setEditVisible] = useState(false);
+  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [editName, setEditName] = useState(user?.name || "");
   const [editPhoto, setEditPhoto] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -44,7 +44,6 @@ export default function CaptainProfile() {
 
   const handleSave = async () => {
     if (!editName.trim()) {
-      Alert.alert("Name required");
       return;
     }
     setSaving(true);
@@ -55,25 +54,20 @@ export default function CaptainProfile() {
       await refreshUser();
       setEditVisible(false);
     } catch (e: unknown) {
-      Alert.alert("Error", e instanceof Error ? e.message : "Failed");
+      console.error("Profile update failed:", e);
     } finally {
       setSaving(false);
     }
   };
 
   const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure you want to logout?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Logout",
-        style: "destructive",
-        onPress: async () => {
-          await logout();
-          // Navigate immediately to login screen
-          router.replace("/(auth)/phone");
-        },
-      },
-    ]);
+    setLogoutModalVisible(true);
+  };
+
+  const confirmLogout = async () => {
+    setLogoutModalVisible(false);
+    await logout();
+    router.replace("/(auth)/phone");
   };
 
   return (
@@ -191,6 +185,34 @@ export default function CaptainProfile() {
                 ) : (
                   <Text style={styles.saveText}>Save</Text>
                 )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Logout Confirmation Modal */}
+      <Modal visible={logoutModalVisible} animationType="fade" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.confirmModal}>
+            <Text style={styles.confirmTitle}>Logout</Text>
+            <Text style={styles.confirmText}>
+              Are you sure you want to logout?
+            </Text>
+            <View style={styles.confirmActions}>
+              <TouchableOpacity
+                testID="cancel-logout-btn"
+                style={styles.cancelBtn}
+                onPress={() => setLogoutModalVisible(false)}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                testID="confirm-logout-btn"
+                style={[styles.saveBtn, styles.logoutConfirmBtn]}
+                onPress={confirmLogout}
+              >
+                <Text style={styles.saveText}>Logout</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -345,5 +367,34 @@ const styles = StyleSheet.create({
     fontFamily: "Manrope_700Bold",
     fontSize: 15,
     color: COLORS.white,
+  },
+  confirmModal: {
+    backgroundColor: COLORS.white,
+    borderRadius: 20,
+    padding: 24,
+    marginHorizontal: 32,
+    alignItems: "center",
+    minWidth: 280,
+  },
+  confirmTitle: {
+    fontFamily: "PlayfairDisplay_700Bold",
+    fontSize: 20,
+    color: COLORS.textPrimary,
+    marginBottom: 12,
+  },
+  confirmText: {
+    fontFamily: "Manrope_500Medium",
+    fontSize: 15,
+    color: COLORS.textSecondary,
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  confirmActions: {
+    flexDirection: "row",
+    gap: 12,
+    width: "100%",
+  },
+  logoutConfirmBtn: {
+    backgroundColor: COLORS.error,
   },
 });
