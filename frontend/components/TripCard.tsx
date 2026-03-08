@@ -77,16 +77,16 @@ export default function TripCard({ trip, onPress, isCaptainView }: TripCardProps
           {isCaptainView ? (
             <View style={styles.interestBadge}>
               <Text style={styles.interestText}>
-                {trip.pending_count || 0} pending
+                {String(trip.pending_count || 0)} pending
               </Text>
             </View>
           ) : (
             <View style={styles.seatBadge}>
-              <Text style={styles.seatText}>{trip.available_seats} seats</Text>
+              <Text style={styles.seatText}>{String(trip.available_seats)} seats</Text>
             </View>
           )}
-          {isCaptainView && (
-            <Text style={styles.captainPrice}>₹{trip.price}</Text>
+          {!!isCaptainView && (
+            <Text style={styles.captainPrice}>{"₹" + trip.price}</Text>
           )}
         </View>
       </View>
