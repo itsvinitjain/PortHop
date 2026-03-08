@@ -1,0 +1,175 @@
+{
+  "project_name": "PortHop",
+  "app_type": "mobile_app_expo",
+  "design_philosophy": {
+    "identity": "The Anti-AI Designer (E1)",
+    "core_principle": "Fusion over Imitation. Nautical Elegance meets Commuter Efficiency.",
+    "emotional_goal": "Turn a mundane ferry commute into a mini-voyage.",
+    "visual_style": "Modern Maritime. High contrast. Sunset warmth against Deep Sea cool.",
+    "target_audience": "Coastal commuters in Maharashtra. Needs clarity, large touch targets, and offline-friendly vibes."
+  },
+  "typography": {
+    "font_family": {
+      "headings": "PlayfairDisplay_700Bold",
+      "body": "Manrope_500Medium",
+      "body_bold": "Manrope_700Bold",
+      "caption": "Manrope_400Regular"
+    },
+    "instructions": "Load fonts using expo-font. If Playfair is unavailable, fallback to system serif. If Manrope is unavailable, fallback to system sans-serif.",
+    "scale": {
+      "h1": { "size": 32, "lineHeight": 40, "tracking": -0.5 },
+      "h2": { "size": 24, "lineHeight": 32, "tracking": -0.25 },
+      "h3": { "size": 20, "lineHeight": 28, "tracking": 0 },
+      "body_lg": { "size": 18, "lineHeight": 28 },
+      "body": { "size": 16, "lineHeight": 24 },
+      "caption": { "size": 14, "lineHeight": 20 },
+      "tiny": { "size": 12, "lineHeight": 16 }
+    }
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "default": "#0A2342",
+        "light": "#15325A",
+        "dark": "#051224",
+        "foreground": "#FFFFFF"
+      },
+      "accent": {
+        "default": "#F5A623",
+        "light": "#FFB74D",
+        "dark": "#D98C0F",
+        "foreground": "#0A2342"
+      },
+      "background": {
+        "default": "#F8FAFC",
+        "paper": "#FFFFFF",
+        "subtle": "#F1F5F9"
+      },
+      "text": {
+        "primary": "#0F172A",
+        "secondary": "#64748B",
+        "tertiary": "#94A3B8",
+        "inverse": "#FFFFFF"
+      },
+      "status": {
+        "success": "#10B981",
+        "error": "#EF4444",
+        "warning": "#F59E0B",
+        "info": "#3B82F6"
+      },
+      "border": "#E2E8F0"
+    },
+    "gradients": {
+      "ocean_depth": ["#0A2342", "#15325A"],
+      "sunset_glow": ["#F5A623", "#FF7E5F"]
+    }
+  },
+  "spacing": {
+    "scale": {
+      "xs": 4,
+      "sm": 8,
+      "md": 16,
+      "lg": 24,
+      "xl": 32,
+      "2xl": 48,
+      "3xl": 64
+    },
+    "layout": {
+      "screen_padding": 20,
+      "card_padding": 20,
+      "gap_sm": 8,
+      "gap_md": 16,
+      "gap_lg": 24
+    }
+  },
+  "components": {
+    "Button": {
+      "base": {
+        "height": 56,
+        "borderRadius": 28,
+        "justifyContent": "center",
+        "alignItems": "center",
+        "paddingHorizontal": 24
+      },
+      "primary": {
+        "backgroundColor": "#0A2342"
+      },
+      "secondary": {
+        "backgroundColor": "#FFFFFF",
+        "borderWidth": 1,
+        "borderColor": "#E2E8F0"
+      },
+      "ghost": {
+        "backgroundColor": "transparent"
+      },
+      "text_style": {
+        "color": "#FFFFFF",
+        "fontFamily": "Manrope_700Bold",
+        "fontSize": 16
+      }
+    },
+    "Card": {
+      "base": {
+        "backgroundColor": "#FFFFFF",
+        "borderRadius": 20,
+        "padding": 20,
+        "shadowColor": "#000",
+        "shadowOffset": { "width": 0, "height": 4 },
+        "shadowOpacity": 0.06,
+        "shadowRadius": 12,
+        "elevation": 3
+      },
+      "trip_card": {
+        "borderLeftWidth": 4,
+        "borderLeftColor": "#F5A623"
+      }
+    },
+    "Input": {
+      "base": {
+        "height": 56,
+        "backgroundColor": "#F1F5F9",
+        "borderRadius": 16,
+        "paddingHorizontal": 16,
+        "fontSize": 16,
+        "color": "#0F172A",
+        "fontFamily": "Manrope_500Medium"
+      },
+      "focused": {
+        "borderWidth": 1,
+        "borderColor": "#0A2342",
+        "backgroundColor": "#FFFFFF"
+      }
+    }
+  },
+  "assets": {
+    "images": {
+      "hero_bg": "https://images.unsplash.com/photo-1703728843356-515de7a3b134?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "login_bg": "https://images.unsplash.com/photo-1691408687210-e3a5272b698b?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "boat_placeholder": "https://images.unsplash.com/photo-1612899359429-5b1f7039074a?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "captain_avatar_1": "https://images.unsplash.com/photo-1620292635956-e957550a518c?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "passenger_avatar_1": "https://images.unsplash.com/photo-1580746453801-37b0bc56f3b4?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "passenger_avatar_2": "https://images.unsplash.com/photo-1766162689608-b14a572cf9d4?crop=entropy&cs=srgb&fm=jpg&q=85"
+    }
+  },
+  "instructions_to_main_agent": [
+    "INSTALL 'nativewind' and 'tailwindcss' immediately. It is the fastest way to implement these styles.",
+    "If nativewind is not possible, use StyleSheet.create mapping strictly to the design tokens above.",
+    "USE 'expo-font' to load Playfair Display and Manrope. If these exact fonts fail to load, use system serif/sans-serif but keep the weights.",
+    "USE 'lucide-react-native' for icons (Boat, Anchor, MapPin, User, MessageCircle).",
+    "MOCK OTP: The OTP is always '123456'.",
+    "NO ADMIN PANEL: Do not build any admin routes.",
+    "NO WEB ONLY CSS: Do not use HTML tags like div, span. Use View, Text, TouchableOpacity, ScrollView, FlatList.",
+    "SAFE AREA: Always wrap screen content in SafeAreaView or use safe-area-insets.",
+    "NAVIGATION: Use standard Expo Router file-based navigation (app/_layout.tsx, app/(tabs)/...).",
+    "DATA: Use the mock data for trips if backend is not ready, but structure the frontend to fetch from API.",
+    "TEST IDS: Add 'data-testid' to all interactive elements."
+  ],
+  "universal_guidelines": [
+    "Do not center align everything. Use left align for text, center for emphasis only.",
+    "Use 2x spacing. If you think 8px is enough, use 16px.",
+    "Add active opacity to buttons (0.8) for feedback.",
+    "Use Lucide icons with stroke width 1.5 or 2 for a crisp look.",
+    "The 'Deep Sea Blue' is your brand anchor. Use it for headers and primary buttons.",
+    "The 'Sunset Gold' is your action trigger. Use it for 'Book Now', 'Confirm', 'New Trip'."
+  ]
+}
