@@ -22,7 +22,7 @@ db = client[os.environ['DB_NAME']]
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
-SECRET_KEY = "porthop_secret_key_v1_2024"
+SECRET_KEY = os.environ['SECRET_KEY']
 ALGORITHM = "HS256"
 MOCK_OTP = "123456"
 PORTS = ["Gateway of India", "Mandwa", "Alibaug", "Elephanta", "Mora", "Karanja", "Rewas", "Murud"]
@@ -193,15 +193,20 @@ async def search_trips(
     if date:
         query["date"] = date
     trips = await db.trips.find(query).sort("created_at", -1).to_list(100)
+    
+    # Batch fetch all captain IDs to avoid N+1 queries
+    captain_ids = list(set(t["captain_id"] for t in trips))
+    captains_cursor = db.users.find({"id": {"$in": captain_ids}})
+    captains_list = await captains_cursor.to_list(len(captain_ids))
+    captains_map = {strip_id(c)["id"]: User(**strip_id(c)) for c in captains_list}
+    
     result = []
     for t in trips:
         strip_id(t)
         trip = Trip(**t)
         td = serialize(trip)
-        cap_doc = await db.users.find_one({"id": trip.captain_id})
-        if cap_doc:
-            strip_id(cap_doc)
-            cap = User(**cap_doc)
+        cap = captains_map.get(trip.captain_id)
+        if cap:
             td["captain"] = {"id": cap.id, "name": cap.name, "photo": cap.photo, "rating": cap.rating, "total_ratings": cap.total_ratings}
         result.append(td)
     return result
@@ -248,15 +253,20 @@ async def get_trip_interests(trip_id: str, current_user: User = Depends(get_curr
     if t["captain_id"] != current_user.id:
         raise HTTPException(status_code=403, detail="Not your trip")
     interests = await db.interests.find({"trip_id": trip_id}).to_list(100)
+    
+    # Batch fetch all passenger IDs to avoid N+1 queries
+    passenger_ids = list(set(i["passenger_id"] for i in interests))
+    passengers_cursor = db.users.find({"id": {"$in": passenger_ids}})
+    passengers_list = await passengers_cursor.to_list(len(passenger_ids))
+    passengers_map = {strip_id(p)["id"]: User(**strip_id(p)) for p in passengers_list}
+    
     result = []
     for i in interests:
         strip_id(i)
         interest = Interest(**i)
         id_ = serialize(interest)
-        p_doc = await db.users.find_one({"id": interest.passenger_id})
-        if p_doc:
-            strip_id(p_doc)
-            p = User(**p_doc)
+        p = passengers_map.get(interest.passenger_id)
+        if p:
             id_["passenger"] = {"id": p.id, "name": p.name, "photo": p.photo, "rating": p.rating}
         result.append(id_)
     return result
