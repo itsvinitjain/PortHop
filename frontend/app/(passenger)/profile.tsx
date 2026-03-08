@@ -14,7 +14,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
 import { api } from "../../utils/api";
 import { useAuth } from "../../contexts/AuthContext";
 import Avatar from "../../components/Avatar";
@@ -22,7 +21,6 @@ import { COLORS } from "../../utils/constants";
 
 export default function PassengerProfile() {
   const { user, logout, refreshUser } = useAuth();
-  const router = useRouter();
   const [editVisible, setEditVisible] = useState(false);
   const [editName, setEditName] = useState(user?.name || "");
   const [editPhoto, setEditPhoto] = useState<string | null>(null);
@@ -60,14 +58,15 @@ export default function PassengerProfile() {
   };
 
   const handleLogout = () => {
-    Alert.alert("Logout", "Are you sure?", [
+    Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Logout",
         style: "destructive",
         onPress: async () => {
           await logout();
-          router.replace("/(auth)/phone");
+          // Navigation is handled by the root AuthGuard in _layout.tsx
+          // which watches user state and redirects when user becomes null
         },
       },
     ]);

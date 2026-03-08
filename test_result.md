@@ -101,3 +101,103 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: "Build PortHop mobile app (iOS/Android). Two users: Captain and Passenger. Signup via OTP. Captain lists trips. Passenger searches and books. Chat between captain/passenger. The current P0 bug is: logout is broken - after login, clicking logout on profile screen does not redirect to login screen."
+
+backend:
+  - task: "User Authentication (OTP + JWT)"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Mock OTP (123456) working. JWT auth working."
+
+  - task: "Trip CRUD APIs"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Trip creation, listing, searching working."
+
+  - task: "Chat APIs"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Chat creation and messaging working."
+
+frontend:
+  - task: "Logout functionality"
+    implemented: true
+    working: "NA"
+    file: "frontend/app/(captain)/profile.tsx, frontend/app/(passenger)/profile.tsx, frontend/app/_layout.tsx"
+    stuck_count: 2
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reported logout is not working - stays on profile screen after clicking logout"
+      - working: false
+        agent: "main"
+        comment: "Attempted fix with router.replace in profile screens. Did not work."
+      - working: "NA"
+        agent: "main"
+        comment: "New fix implemented: Added RootLayoutNav component in _layout.tsx that uses useSegments + useEffect to watch user state. When user becomes null and not in auth group, it redirects to /(auth)/phone. Profile screens now just call logout() - no manual router.replace. This is the canonical Expo Router auth guard pattern."
+
+  - task: "Captain login and trip posting flow"
+    implemented: true
+    working: true
+    file: "frontend/app/(captain)/"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Login -> setup -> captain tabs working."
+
+  - task: "Passenger search and interest flow"
+    implemented: true
+    working: true
+    file: "frontend/app/(passenger)/"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Passenger flow working."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: true
+
+test_plan:
+  current_focus:
+    - "Logout functionality"
+  stuck_tasks:
+    - "Logout functionality"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Fixed the recurring logout bug by adding a persistent AuthGuard (RootLayoutNav) in _layout.tsx. This component uses useSegments + useRouter + useEffect to watch user state. When user becomes null and not in the auth group, it calls router.replace('/(auth)/phone'). Profile screens now only call logout() without any manual navigation. Please test the full logout flow: Login (phone: any 10 digits, OTP: 123456) -> complete profile setup (if new user) -> navigate to Profile tab -> click Logout button -> confirm -> should redirect to phone login screen."
